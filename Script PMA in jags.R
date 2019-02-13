@@ -1,5 +1,3 @@
-library(rjags)
-library(coda)
 library(R2jags)
 help(jags)
 
