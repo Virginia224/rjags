@@ -73,3 +73,63 @@ PMAinJAGS<- jags(mydata,initialval,parameters.to.save = c("tau","mean", "theta")
 
 #results
 print(PMAinJAGS)
+
+
+
+
+
+#######################
+# make the model (Fixed effects)
+#######################
+PMAcontinuous_FE=function() {
+  
+  for(i in 1:ns) { 
+    
+    #likelihood
+    y[i,1] ~ dnorm(phi[i,1],prec.i[i,1])  #likelihood in one arm
+    y[i,2] ~ dnorm(phi[i,2],prec.i[i,2])  #likelihood in one arm
+    prec.i[i,1] <- 1/((sd[i,1]^2)/n[i,1])
+    prec.i[i,2]<- 1/((sd[i,2]^2)/n[i,2])
+    
+    #calculate pooled sd
+    numerator[i] <- sum(n[i,1:2]*sd[i,1:2]*sd[i,1:2])
+    
+    s.pooled[i] <- sqrt(numerator[i]/(sum(n[i,1:2])-2))
+    
+    
+    #parametrisation
+    phi[i,1]<- u[i]*s.pooled[i]
+    phi[i,2]<- (u[i] + mean)*s.pooled[i]  ## SMD
+    # theta[i] ~ dnorm(mean,prec)
+    
+  }
+  
+  #prior distributions
+  for (i in 1:ns) {
+    u[i] ~ dnorm(0,.01)
+  }
+  tau ~ dunif(0,2)   #dnorm(0,100)%_%T(0,)                                 
+  prec<- 1/pow(tau,2)
+  mean ~ dnorm(0,100)
+  
+}
+#end of model
+
+
+#######################
+# initial values
+#######################
+
+initialval = NULL
+#initialval = list(list(tau=0.2,mean=0.3))
+
+
+
+#######################
+# run the model
+#######################
+
+PMAinJAGS_FE<- jags(mydata,initialval,parameters.to.save = c("mean"), n.chains = 2, n.iter = 10000, n.burnin = 1000, DIC=F, model.file = PMAcontinuous_FE)
+
+#results
+print(PMAinJAGS_FE)
