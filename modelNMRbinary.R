@@ -43,4 +43,16 @@ modelNMRbinary <- function ()
   for (j in (ref + 1):nt) {
     ORref[j] <- exp(d[j] - d[ref])
   }
+  for (i in 1:nt) {
+    for (j in 1:nt) {
+      beta[i, j] <- b[j] - b[i]
+    }
+  }
+  b[ref] <- 0
+  for (k in 1:(ref - 1)) {
+    b[k] ~ dnorm(0, 1e-04)
+  }
+  for (k in (ref + 1):nt) {
+    b[k] ~ dnorm(0, 1e-04)
+  }
 }

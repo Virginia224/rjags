@@ -50,7 +50,7 @@ PMAcontinuous=function() {
   }
   tau ~ dunif(0,2)   #dnorm(0,100)%_%T(0,)                                 
   prec<- 1/pow(tau,2)
-  mean ~ dnorm(0,100)
+  mean ~ dnorm(0,0.1)
   
 }
 #end of model
@@ -74,7 +74,8 @@ PMAinJAGS<- jags(mydata,initialval,parameters.to.save = c("tau","mean", "theta")
 #results
 print(PMAinJAGS)
 
-
+traceplot(PMAinJAGS,varname="tau")
+traceplot(PMAinJAGS,varname="mean")
 
 
 
@@ -110,7 +111,7 @@ PMAcontinuous_FE=function() {
   }
   tau ~ dunif(0,2)   #dnorm(0,100)%_%T(0,)                                 
   prec<- 1/pow(tau,2)
-  mean ~ dnorm(0,100)
+  mean ~ dnorm(0,0.1)
   
 }
 #end of model
@@ -129,7 +130,7 @@ initialval = NULL
 # run the model
 #######################
 
-PMAinJAGS_FE<- jags(mydata,initialval,parameters.to.save = c("mean"), n.chains = 2, n.iter = 10000, n.burnin = 1000, DIC=F, model.file = PMAcontinuous_FE)
+PMAinJAGS_FE<- jags(mydata,initialval,parameters.to.save = c("mean", "tau"), n.chains = 2, n.iter = 10000, n.burnin = 1000, DIC=F, model.file = PMAcontinuous_FE)
 
 #results
 print(PMAinJAGS_FE)
